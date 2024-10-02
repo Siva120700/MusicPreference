@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Image from 'next/image';
+import Image from "next/image";
 
 interface Stream {
   id: string;
@@ -29,8 +29,6 @@ const Queue = () => {
 
   useEffect(() => {
     fetchQueue();
-    const interval = setInterval(fetchQueue, 100); 
-    return () => clearInterval(interval);
   }, []);
 
   const handleVote = async (streamId: string) => {

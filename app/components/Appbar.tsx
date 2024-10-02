@@ -7,7 +7,7 @@ const AppBar = () => {
   return (
     <header className="bg-gray-900 text-white shadow-md fixed w-full top-0 z-50">
       <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-        <h1 className="text-3xl font-bold">Your Music</h1>
+        <h1 className="text-3xl text-orange-300 font-bold">YMusic</h1>
         <div>
           {session ? (
             <button

@@ -1,6 +1,7 @@
+// components/NowPlaying.tsx
 "use client";
-import { useEffect, useState, useRef } from "react";
-import Image from "next/image";
+import { useEffect, useState, useRef, useCallback } from "react";
+// import Image from "next/image";
 
 interface Stream {
   id: string;
@@ -42,7 +43,6 @@ const NowPlaying = () => {
     }
   }, []);
 
- // this will remove the songs which has completed 
   const removeSongFromQueue = async (streamId: string) => {
     try {
       const response = await fetch("/api/streams", {
@@ -63,40 +63,41 @@ const NowPlaying = () => {
     }
   };
 
-  const handleSongEnd = async () => {
+  const handleSongEnd = useCallback(async () => {
     if (nowPlaying) {
       await removeSongFromQueue(nowPlaying.id);
-
       const updatedQueue = queue.filter((song) => song.id !== nowPlaying.id);
       setQueue(updatedQueue);
-
-      
-      const currentIndex = queue.findIndex((song) => song.id === nowPlaying?.id);
+      const currentIndex = queue.findIndex(
+        (song) => song.id === nowPlaying?.id
+      );
       if (currentIndex !== -1 && currentIndex + 1 < queue.length) {
-        setNowPlaying(queue[currentIndex + 1]); 
+        setNowPlaying(queue[currentIndex + 1]);
       } else {
-        setNowPlaying(null); 
+        setNowPlaying(null);
       }
     }
-  };
+  }, [nowPlaying, queue]);
 
-  const onPlayerStateChange = (event: any) => {
-    
-    if (event.data === 0) {
-      handleSongEnd(); 
-    }
-  };
+  const onPlayerStateChange = useCallback(
+    (event: any) => {
+      if (event.data === 0) {
+        handleSongEnd();
+      }
+    },
+    [handleSongEnd]
+  );
 
   useEffect(() => {
     if (nowPlaying && isYouTubeAPIReady && playerRef.current) {
       const player = new window.YT.Player(playerRef.current, {
         videoId: extractYouTubeId(nowPlaying.url),
         events: {
-          onStateChange: onPlayerStateChange, 
+          onStateChange: onPlayerStateChange,
         },
       });
     }
-  }, [nowPlaying, isYouTubeAPIReady]);
+  }, [nowPlaying, isYouTubeAPIReady, onPlayerStateChange]);
 
   const extractYouTubeId = (url: string) => {
     const regExp =
@@ -106,39 +107,45 @@ const NowPlaying = () => {
   };
 
   return (
-    <div className="mt-24 bg-black text-white p-4 rounded-lg shadow-md w-full max-w-4xl mx-auto">
-      {nowPlaying ? (
-        <div>
-          <div className="flex items-center space-x-4">
-            <Image
+    <div className="h-screen snap-start relative bg-black text-white flex items-center justify-center">
+      {/* Now Playing Content */}
+      <div className="text-center">
+        {nowPlaying ? (
+          <div>
+            <h2 className="text-4xl font-bold mb-4">Now Playing</h2>
+            {/* <Image
               src={nowPlaying.thumbnail_url}
               alt="Thumbnail"
-              width={200}
-              height={200}
+              width={300}
+              height={300}
               className="rounded-md"
-            />
-            <div>
-              <h2 className="text-xl font-semibold">Now Playing</h2>
-              <p>{nowPlaying.url}</p>
-              <div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
-                <div id="player-container" className="absolute top-0 left-0 w-full h-full">
-                  <iframe
-                    ref={playerRef}
-                    width="100%"
-                    height="100%"
-                    src={`https://www.youtube.com/embed/${extractYouTubeId(nowPlaying.url)}?enablejsapi=1`}
-                    frameBorder="0"
-                    allow="autoplay; encrypted-media"
-                    allowFullScreen
-                  />
-                </div>
+            /> */}
+            <div
+              className="relative w-[60vw] h-[60vh] mx-auto mt-5"
+              style={{ paddingBottom: "33.75%" }}
+            >
+              <div
+                id="player-container"
+                className="absolute top-0 left-0 w-full h-full"
+              >
+                <iframe
+                  ref={playerRef}
+                  width="100%"
+                  height="100%"
+                  src={`https://www.youtube.com/embed/${extractYouTubeId(
+                    nowPlaying.url
+                  )}?enablejsapi=1`}
+                  frameBorder="0"
+                  allow="autoplay; encrypted-media"
+                  allowFullScreen
+                />
               </div>
             </div>
           </div>
-        </div>
-      ) : (
-        <p>No song is currently playing</p>
-      )}
+        ) : (
+          <p>No song is currently playing</p>
+        )}
+      </div>
     </div>
   );
 };
