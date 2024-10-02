@@ -1,0 +1,13 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* styles/globals.css */
+
+body {
+    background: linear-gradient(135deg, #000000 50%, #151d3a 50%);
+    color: #fff; /* Ensure text is visible against the dark background */
+    margin: 0; /* Remove default margin */
+    font-family: 'Arial', sans-serif; /* Adjust font if necessary */
+  }
+  
